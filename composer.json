@@ -1,14 +1,19 @@
 {
     "name": "stepzerosolutions/tbslider",
-    "description": "Twitter bootstrap slider for Magento 2",
-    "keywords": ["magento", "Magento 2 slider"],
-    "authors": [
-        {
-            "name": "D N N Udugala"
-        }
-    ],
-    "support": {
-        "issues": "https://github.com/stepzerosolutions/tbslider/issues"
+    "description": "N/A",
+    "require": {
+        "php": "~5.5.0|~5.6.0|~7.0.0",
+        "magento/framework": "100.0.*"
     },
-    "license": "CC"
+    "type": "magento2-theme",
+    "version": "1.0.2",
+    "license": [
+        "OSL-3.0",
+        "AFL-3.0"
+    ],
+    "autoload": {
+        "files": [
+            "registration.php"
+        ]
+    }
 }
