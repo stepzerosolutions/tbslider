@@ -9,27 +9,16 @@ namespace Stepzerosolutions\Tbslider\Setup;
 use Magento\Framework\Setup\UpgradeDataInterface;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
-use Stepzerosolutions\Tbslider\Model\Slider;
 /**
  * @codeCoverageIgnore
  */
 class UpgradeData implements UpgradeDataInterface
 {
 
-    /**
-     * Customer setup factory
-     *
-     * @var SliderFactory
-     */
-    protected $sliderFactory;
-
-
     public function __construct(
-        SliderFactory $sliderFactory,
         IndexerRegistry $indexerRegistry,
         \Magento\Eav\Model\Config $eavConfig
     ) {
-        $this->sliderFactory = $sliderFactory;
     }
 	
 	

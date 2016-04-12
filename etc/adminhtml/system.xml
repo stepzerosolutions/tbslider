@@ -36,7 +36,7 @@
                     <label>Small device width</label>
 					<comment>Leave emppty for Default - 922</comment>
                 </field>
-                <field id="Extra small device width" translate="label" type="text" sortOrder="8" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="xsdevices" translate="label" type="text" sortOrder="8" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Extra small device width</label>
 					<comment>Leave emppty for Default - 768</comment>
                 </field>
