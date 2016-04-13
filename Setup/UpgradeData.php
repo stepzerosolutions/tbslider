@@ -16,7 +16,6 @@ class UpgradeData implements UpgradeDataInterface
 {
 
     public function __construct(
-        IndexerRegistry $indexerRegistry,
         \Magento\Eav\Model\Config $eavConfig
     ) {
     }
