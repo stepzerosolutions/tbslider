@@ -93,40 +93,46 @@ class Slider extends \Magento\Framework\View\Element\Template
      */
     protected function _beforeToHtml()
     {
-        parent::_beforeToHtml();//die(var_dump( $this->getSliderId) );
-        $sliderId = 1;
-        if ($sliderId) {
-            $storeId = $this->_storeManager->getStore()->getId();
-            $slider = $this->_sliderFactory->create();
-            $sliderData = $slider->load($sliderId);
-			$sliderItemsData = $this->_slideritemsCollection->create()
-			->addFieldToFilter( 'slideritem_slider', ['eq' => $sliderData->getId()] )
-			->addFieldToFilter( 'is_active', ['eq' => 1] )
-			->setOrder( 'slider_sort', 'desc' );
-			$responsive = implode( ",", $slider->getResponsiveWidth() );
+        $store = $this->_storeManager->getStore()->getId();
 
-			if( $sliderData->getSliderType()==0 ) {
-				$sliderTemplate = new Fullwidth($this->_storeManager);
+        if ($this->_scopeConfig->getValue(
+            SliderModel::XMLSLIDERSTATUS, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $store
+        ) ) {
+			parent::_beforeToHtml();
+			$sliderId = $this->getSliderId();
+			if ($sliderId) {
+				$storeId = $this->_storeManager->getStore()->getId();
+				$slider = $this->_sliderFactory->create();
+				$sliderData = $slider->load($sliderId);
+				$sliderItemsData = $this->_slideritemsCollection->create()
+				->addFieldToFilter( 'slideritem_slider', ['eq' => $sliderData->getId()] )
+				->addFieldToFilter( 'is_active', ['eq' => 1] )
+				->setOrder( 'slider_sort', 'desc' );
+				$responsive = implode( ",", $slider->getResponsiveWidth() );
+	
+				if( $sliderData->getSliderType()==0 ) {
+					$sliderTemplate = new Fullwidth($this->_storeManager);
+				}
+				$sliderTemplate->setSliderResponsiveData($responsive);
+				$sliderTemplate->setSliderData($sliderData);
+				$sliderTemplate->setSlideritems($sliderItemsData);
+				
+				if( $sliderData->getStatus()) {
+					$output = $this->buildStyling($sliderData);
+					$output .= '<div class="slidercontainer">';
+					$output .= '<div class="slider_'.$sliderData->getID().'">';
+					$output .= $sliderTemplate->renderSlider();
+					$output .= '</div></div>';
+					$output .= '
+							<script type="text/javascript">
+							require([\'jquery\',\'sz/tbslider\'], function($) {
+							});
+							</script>';
+					$this->setText($output);
+				}
 			}
-			$sliderTemplate->setSliderResponsiveData($responsive);
-			$sliderTemplate->setSliderData($sliderData);
-			$sliderTemplate->setSlideritems($sliderItemsData);
-			
-            if( $sliderData->getStatus()) {
-				$output = $this->buildStyling($sliderData);
-				$output .= '<div class="slidercontainer">';
-				$output .= '<div class="slider_'.$sliderData->getID().'">';
-				$output .= $sliderTemplate->renderSlider();
-				$output .= '</div></div>';
-				$output .= '
-						<script type="text/javascript">
-						require([\'jquery\',\'sz/tbslider\'], function($) {
-						});
-						</script>';
-                $this->setText($output);
-            }
-        }
-        return $this;
+			return $this;
+		}
     }
 	
 	
@@ -139,12 +145,10 @@ class Slider extends \Magento\Framework\View\Element\Template
 
         if ($this->_scopeConfig->getValue(
             SliderModel::XMLSLIDERSTATUS, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $store
-        )
-        ) {
+        ) ) {
 			//return parent::_toHtml();
             return $this->getText();
         }
-
         return '';
     }
 	
