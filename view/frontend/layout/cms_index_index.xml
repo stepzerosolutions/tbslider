@@ -7,14 +7,14 @@
 -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
-		<referenceContainer name="page.top">
-			<container name="sliderwrapper" htmlTag="div" htmlClass="sliderwrapper" >
+		<referenceBlock name="content">
+			<container name="sliderwrapper" htmlTag="div" htmlClass="sliderwrapper" before="-" >
 				<block class="Stepzerosolutions\Tbslider\Block\Slider" name="slider.cms.content.top" as="slider_container">
 					<arguments>
 						<argument name="slider_id" xsi:type="number">1</argument>
 					</arguments>
 				</block>
 			</container>
-        </referenceContainer>
+        </referenceBlock>
     </body>
 </page>

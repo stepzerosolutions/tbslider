@@ -11,7 +11,7 @@
 define([
     "jquery",
     "jquery/ui",
-	"stepzerosolutions/bootstrap"
+	"sz/bootstrap"
 ], function($){
 	$.fn.szeroslider = function( status ) {
 		var bwidth = $(window).width();
