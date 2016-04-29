@@ -4,7 +4,7 @@ Bootstrap slider for Magento 2.
 Slider use twitter bootstrap bootstrap carousel.
 
 # Version
-Current version is 1.0.2. Please download Production version from Master Branch.
+Current version is 1.0.3. Please download Production version from Master Branch.
 
 
 # Features
