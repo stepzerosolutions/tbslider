@@ -19,4 +19,5 @@ interface TemplatesInterface extends ExtensibleDataInterface
 	public function setSliderData($sliderdata);
 	public function setSlideritems($firstitem);
 	public function renderSlider();
+	public function renderSliderLayout();
 }

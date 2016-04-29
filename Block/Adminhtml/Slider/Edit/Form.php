@@ -365,6 +365,22 @@ class Form extends \Magento\Backend\Block\Widget\Form\Generic
             ]
         );
 
+
+		
+        $hidexs = $designFieldset->addField(
+            'hidenavigation',
+            'select',
+            [
+                'name' => 'hidenavigation',
+                'label' => __('Hide Navigation Controls'),
+                'title' => __('Hide Navigation Controls'),
+                'class' => '',
+				'options' => ['1' => __('Yes'), '0' => __('No')],
+				'value' => (( empty($slider->getHidenavigation()))?0:$slider->getHidenavigation())
+            ]
+        );
+		
+		
         if (!$slider->getId()) {
             $slider->setData('status', '0');
         }

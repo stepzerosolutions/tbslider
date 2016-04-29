@@ -121,6 +121,7 @@ class Save extends \Stepzerosolutions\Tbslider\Controller\Adminhtml\Slider
 				$slider_hidexs = (int)$this->getRequest()->getParam('slider_hidexs');
 				$slider_duration = (int)$this->getRequest()->getParam('slider_duration');
 				$slidermeta = (string)$this->getRequest()->getParam('slidermeta');
+				$hidenavigation = (string)$this->getRequest()->getParam('hidenavigation');
 
 				$slider->setSliderClass($slider_class);
 				$slider->setSliderBgcolor($slider_bgcolor);
@@ -133,6 +134,7 @@ class Save extends \Stepzerosolutions\Tbslider\Controller\Adminhtml\Slider
 				$slider->setSliderHidexs($slider_hidexs);
 				$slider->setSliderDuration($slider_duration);
 				$slider->setStores($stores);
+				$slider->setHidenavigation($hidenavigation);
                 $this->sliderRepository->save($slider);
 
                 $this->messageManager->addSuccess(__('You saved the Slider.'));
