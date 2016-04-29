@@ -152,6 +152,10 @@ implements SliderInterface
     public function getStores(){
 		return explode(",", $this->getData( self::STORES ) );
 	}
+
+    public function getHidenavigation(){
+		return $this->getData(self::HIDENAVIGATION);
+	}
 	
 	// set items
 	public function setId($id){
@@ -228,6 +232,9 @@ implements SliderInterface
 	}
     public function setStores( $stores ){
 		return $this->setData( self::STORES, implode(",", $stores) ."," );
+	}
+    public function setHidenavigation( $hidenavigation ){
+		return $this->setData( self::HIDENAVIGATION,$hidenavigation );
 	}
 
 

@@ -97,6 +97,33 @@ class UpgradeData implements UpgradeDataInterface
 			 }
 			}
 			
+			if (version_compare($context->getVersion(), '1.0.4') < 0) {
+			/**
+			 * Create New field called is_active in 'slider'
+			 */
+			 $tableName = $setup->getTable('slider');
+			 if ($setup->getConnection()->isTableExists($tableName) == true) {
+				$columns = [
+                    'hidenavigation' => [
+                        'type' => \Magento\Framework\DB\Ddl\Table::TYPE_SMALLINT,
+                        'nullable' => false,
+                        'comment' => 'Hide Navigation',
+                    ],
+                ];
+				$remove = ['status'];
+				
+               	$connection = $setup->getConnection();
+                foreach ($columns as $name => $definition) {
+                    $connection->addColumn($tableName, $name, $definition);
+                }
+                foreach ($remove as $name => $definition) {
+                    $connection->addColumn($tableName, $name, $definition);
+                }
+			 }
+			}
+			
+
+
 
 		  $setup->endSetup();
     }

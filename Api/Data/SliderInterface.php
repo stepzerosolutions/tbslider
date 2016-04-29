@@ -39,6 +39,7 @@ interface SliderInterface extends ExtensibleDataInterface
     const STATUS	    	= 'status';
     const TIMESTAMP		 	= 'timestamp';
 	const STORES		 	= 'stores';
+	const HIDENAVIGATION	= 'hidenavigation';
 
     /**
      * Get id
@@ -217,6 +218,14 @@ interface SliderInterface extends ExtensibleDataInterface
      */
     public function getStores();
 	
+    /**
+     * Get Hide navigation
+     *
+     * @api
+     * @return text|null
+     */
+    public function getHidenavigation();
+	
 	
 	/**
 	* @return $this
@@ -318,4 +327,9 @@ interface SliderInterface extends ExtensibleDataInterface
 	* @return $this
 	*/
     public function setStores( $stores );
+	/**
+	* @return $this
+	*/
+    public function setHidenavigation( $stores );
+	
 }

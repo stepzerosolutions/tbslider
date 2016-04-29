@@ -118,8 +118,10 @@ class Slider extends \Magento\Framework\View\Element\Template
 				$sliderTemplate->setSlideritems($sliderItemsData);
 				
 				if( $sliderData->getStatus()) {
-					$output = $this->buildStyling($sliderData);
-					$output .= '<div class="slidercontainer">';
+					$output = $sliderTemplate->renderSliderLayout();
+					$output .= '<div class="slidercontainer';
+					$output .= ( $sliderData->getSliderHidexs() )?' hidden-xs':'';
+					$output .= '">';
 					$output .= '<div class="slider_'.$sliderData->getID().'">';
 					$output .= $sliderTemplate->renderSlider();
 					$output .= '</div></div>';
@@ -152,92 +154,5 @@ class Slider extends \Magento\Framework\View\Element\Template
         return '';
     }
 	
-	public function buildStyling($sliderData){
-		$slider = 'div.slider_'.$sliderData->getID().'{';
-		$sliderwrap = '.slidercontainer{margin:0 auto;';
-		$slideraftermaxwidth = '';
-		if( !empty($sliderData->getSliderWidth() ) ) {
-			if( strstr($sliderData->getSliderWidth(), "%")!=false ) {
-				$sliderWidth = ( strstr($sliderData->getSliderWidth(), "px") )?$sliderData->getSliderWidth().'px':$sliderData->getSliderWidth();
-			} else {
-				$sliderWidth = $sliderData->getSliderWidth();
-			}
-			$slider .= sprintf( "width:%s;", $sliderWidth );
-			$sliderwrap .= sprintf( "width:%s;", $sliderWidth );
-			$slideraftermaxwidth .= '@media (max-width: '.$sliderWidth.'){.slidercontainer,div.slider_'.$sliderData->getID().'{width:100%;}}';
-		} else {
-			$slider .= "width:100%;";
-			$sliderwrap .= "width:100%;";
-		}
-		if( !empty($sliderData->getSliderHeight() ) ) {
-			if( strstr($sliderData->getSliderHeight(), "%")!=false ) {
-				$sliderHeight = ( strstr($sliderData->getSliderHeight(), "px") )?$sliderData->getSliderHeight().'px':$sliderData->getSliderHeight();
-			} else {
-				$sliderHeight = $sliderData->getSliderHeight();
-			}
-			$slider .= sprintf( "height:%s;", $sliderHeight );
-			$slider .= "overflow:hidden;";
-		}
-		$slider .= '}';
-		$sliderwrap .= '}';
-				
-		$sliderItems = 'div.slider_'.$sliderData->getID().' .carousel-item{';
-		if( !empty($sliderData->getSliderWidth() ) ) {
-			$sliderItems .= "width:100%;";
-		} 
-		$sliderItems .= '}';
-		 
-		$mobileDevice = '@media (max-width: 768px){';
-		$mobileDevice .= '.slidercontainer{';
-		if( !empty($sliderData->getSliderWidthxs() ) ) {
-			$mobileDeviceWidth = sprintf( "width:%dpx;", $sliderData->getSliderWidthxs() );
-		} else {
-			$mobileDeviceWidth = "width:100%;";
-			$mobileDeviceWidth .= "max-width:768px;";
-		}
-		$mobileDevice .= $mobileDeviceWidth . '}';
-		$mobileDevice .= 'div.slider_'.$sliderData->getID().'{';
-		$mobileDevice .= $mobileDeviceWidth ;
-		$mobileDevice .= 'height:auto;';
-		$mobileDevice .= '}';
-		$mobileDevice .= '}';
-		
-		
-		$smallDevice = '@media (max-width: 922px){';
-		$smallDevice .= '.slidercontainer{';
-		if( !empty($sliderData->getSliderWidthsm() ) ) {
-			$smallDeviceWidth = sprintf( "width:%dpx;", $sliderData->getSliderWidthsm() );
-		} else {
-			$smallDeviceWidth = "width:100%;";
-			$smallDeviceWidth .= "max-width:922px;";
-		}
-		$smallDevice .= $smallDeviceWidth . '}';
-		$smallDevice .= 'div.slider_'.$sliderData->getID().'{';
-		$smallDevice .= $smallDeviceWidth ;
-		$smallDevice .= 'height:auto;';
-		$smallDevice .= '}';
-		$smallDevice .= '}';
-		
-		
-		$mediumDevice = '@media (max-width: 1024px){';
-		$mediumDevice .= '.slidercontainer{';
-		if( !empty($sliderData->getSliderWidthmd() ) ) {
-			$mediumDeviceWidth = sprintf( "width:%dpx;", $sliderData->getSliderWidthmd() );
-		} else {
-			$mediumDeviceWidth = "width:100%;";
-			$mediumDeviceWidth .= "max-width:1024px;";
-		}
-		$mediumDevice .= $mediumDeviceWidth . '}';
-		$mediumDevice .= 'div.slider_'.$sliderData->getID().'{';
-		$mediumDevice .= $mediumDeviceWidth ;
-		$mediumDevice .= 'height:auto;';
-		$mediumDevice .= '}';
-		$mediumDevice .= '}';
-
-		
-		$output = '<style>';
-		$output .= $sliderwrap . $slider . $sliderItems . $mediumDevice . $smallDevice . $mobileDevice .$slideraftermaxwidth;
-		$output .= '</style>';
-		return $output;
-	}
+	
 }
