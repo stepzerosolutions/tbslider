@@ -12,6 +12,8 @@ Current version is 1.0.2. Please download Production version from Latest Release
 
 * Layered HTML Content
 * Slider Navition Control
+* Auto detect templates
+
 
 
 
