@@ -144,6 +144,7 @@ class Form extends \Magento\Backend\Block\Widget\Form\Generic
         }
 		
 		
+		$tmpstatus = $slider->getStatus();
         $fieldset->addField(
             'status',
             'select',
@@ -153,7 +154,7 @@ class Form extends \Magento\Backend\Block\Widget\Form\Generic
                 'name' => 'status',
                 'required' => true,
                 'options' => ['1' => __('Enabled'), '0' => __('Disabled')],
-				'value' => (( empty($slider->getStatus()))?0:$slider->getStatus())
+				'value' => (( empty($tmpstatus))?0:$slider->getStatus())
             ]
         );
 		

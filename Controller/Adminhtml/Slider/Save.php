@@ -10,12 +10,13 @@ use Stepzerosolutions\Tbslider\Api\Data\SliderInterfaceFactory;
 use Stepzerosolutions\Tbslider\Api\Data\SliderInterface;
 use Stepzerosolutions\Tbslider\Api\SliderRepositoryInterface;
 
-class Save extends \Stepzerosolutions\Tbslider\Controller\Adminhtml\Slider
+class Save extends 
+\Stepzerosolutions\Tbslider\Controller\Adminhtml\Slider
 {
     /**
      * @var \Magento\Framework\Reflection\DataObjectProcessor
      */
-    protected $dataObjectProcessor;
+    protected $_dataObjectProcessor;
 
 
     /**
@@ -37,7 +38,7 @@ class Save extends \Stepzerosolutions\Tbslider\Controller\Adminhtml\Slider
         \Magento\Framework\View\Result\PageFactory $resultPageFactory,
         \Magento\Framework\Reflection\DataObjectProcessor $dataObjectProcessor
     ) {
-        $this->dataObjectProcessor = $dataObjectProcessor;
+        $this->_dataObjectProcessor = $dataObjectProcessor;
         parent::__construct(
             $context,
             $coreRegistry,
@@ -91,16 +92,16 @@ class Save extends \Stepzerosolutions\Tbslider\Controller\Adminhtml\Slider
                     $sliderDescription = null;
                 }
                 $slider->setSliderDescription($sliderDescription);
-                $slider_width = $this->getRequest()->getParam('slider_width');
-                if (empty($slider_width)) {
-                    $slider_width = null;
+                $sliderWidth = $this->getRequest()->getParam('slider_width');
+                if (empty($sliderWidth)) {
+                    $sliderWidth = null;
                 }
-                $slider->setSliderWidth($slider_width);
-                $slider_height = $this->getRequest()->getParam('slider_height');
-                if (empty($slider_height)) {
-                    $slider_height = null;
+                $slider->setSliderWidth($sliderWidth);
+                $sliderHeight = $this->getRequest()->getParam('slider_height');
+                if (empty($sliderHeight)) {
+                    $sliderHeight = null;
                 }
-                $slider->setSliderHeight($slider_height);
+                $slider->setSliderHeight($sliderHeight);
                 $status = (int)$this->getRequest()->getParam('status');
                 if (empty($status)) {
                     $status = null;
@@ -110,29 +111,29 @@ class Save extends \Stepzerosolutions\Tbslider\Controller\Adminhtml\Slider
                     $stores = null;
                 }
                 $slider->setStatus($status);
-				$slider_class = (string)$this->getRequest()->getParam('slider_class');
-				$slider_bgcolor = (string)$this->getRequest()->getParam('slider_bgcolor');
-				$slider_autoresoponsive = (int)$this->getRequest()->getParam('slider_autoresoponsive');
-				$slider_type = (int)$this->getRequest()->getParam('slider_type');
+				$sliderClass = (string)$this->getRequest()->getParam('slider_class');
+				$sliderBgcolor = (string)$this->getRequest()->getParam('slider_bgcolor');
+				$sliderAutoresoponsive = (int)$this->getRequest()->getParam('slider_autoresoponsive');
+				$sliderType = (int)$this->getRequest()->getParam('slider_type');
 				$pauseonhover = (int)$this->getRequest()->getParam('pauseonhover');
 				$wrap = (int)$this->getRequest()->getParam('wrap');
 				$keyboard = (int)$this->getRequest()->getParam('keyboard');
 				$slidermeta = (string)$this->getRequest()->getParam('slidermeta');
-				$slider_hidexs = (int)$this->getRequest()->getParam('slider_hidexs');
-				$slider_duration = (int)$this->getRequest()->getParam('slider_duration');
+				$sliderHidexs = (int)$this->getRequest()->getParam('slider_hidexs');
+				$sliderDuration = (int)$this->getRequest()->getParam('slider_duration');
 				$slidermeta = (string)$this->getRequest()->getParam('slidermeta');
 				$hidenavigation = (string)$this->getRequest()->getParam('hidenavigation');
 
-				$slider->setSliderClass($slider_class);
-				$slider->setSliderBgcolor($slider_bgcolor);
-				$slider->setSliderAutoresponsive($slider_autoresoponsive);
-				$slider->setSliderType($slider_type);
+				$slider->setSliderClass($sliderClass);
+				$slider->setSliderBgcolor($sliderBgcolor);
+				$slider->setSliderAutoresponsive($sliderAutoresoponsive);
+				$slider->setSliderType($sliderType);
 				$slider->setPauseonhover($pauseonhover);
 				$slider->setWrap($wrap);
 				$slider->setKeyboard($keyboard);
 				$slider->setSlidermeta($slidermeta);
-				$slider->setSliderHidexs($slider_hidexs);
-				$slider->setSliderDuration($slider_duration);
+				$slider->setSliderHidexs($sliderHidexs);
+				$slider->setSliderDuration($sliderDuration);
 				$slider->setStores($stores);
 				$slider->setHidenavigation($hidenavigation);
                 $this->sliderRepository->save($slider);
@@ -143,7 +144,7 @@ class Save extends \Stepzerosolutions\Tbslider\Controller\Adminhtml\Slider
                 $this->messageManager->addError($e->getMessage());
                 if ($slider != null) {
                     $this->storeSliderDataToSession(
-                        $this->dataObjectProcessor->buildOutputDataArray(
+                        $this->_dataObjectProcessor->buildOutputDataArray(
                             $slider,
                             '\Stepzerosolutions\Tbslider\Api\Data\SliderInterface'
                         )

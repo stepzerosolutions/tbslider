@@ -232,7 +232,9 @@ class Save extends \Stepzerosolutions\Tbslider\Controller\Adminhtml\Slideritems
 							}
 						}
 						
-						if( empty($slideritems->getSliderImageMdPath() ) && !empty( $slideritems->getSliderImagePath() ) ){
+						$sliderimagemdpath = $slideritems->getSliderImageMdPath();
+						$sliderimagepath = $slideritems->getSliderImagePath();
+						if( empty( $sliderimagemdpath ) && !empty( $sliderimagepath ) ){
 							//create MD slider from Main Image
 							$thumbDirtmp = str_replace( $this->_imageprocessor->getSliderMediaPath(), 
 								$this->_imageprocessor->getSliderMediaPath('md'), 
@@ -292,7 +294,10 @@ class Save extends \Stepzerosolutions\Tbslider\Controller\Adminhtml\Slideritems
 								$data['filenamesm'] = null;
 							}
 						}
-						if( empty($slideritems->getSliderImageSmPath() ) && !empty( $slideritems->getSliderImagePath() ) ){
+						
+						$sliderimagesmpath = $slideritems->getSliderImageSmPath();
+						$sliderimagepath = $slideritems->getSliderImagePath();
+						if( empty($sliderimagesmpath ) && !empty( $sliderimagepath ) ){
 							//create MD slider from Main Image
 							$thumbDirtmp = str_replace( $this->_imageprocessor->getSliderMediaPath(), 
 								$this->_imageprocessor->getSliderMediaPath('sm'), 
@@ -352,7 +357,10 @@ class Save extends \Stepzerosolutions\Tbslider\Controller\Adminhtml\Slideritems
 								$data['filenamexs'] = null;
 							}
 						}
-						if( empty($slideritems->getSliderImageXsPath() ) && !empty( $slideritems->getSliderImagePath() ) ){
+						
+						$sliderimagexspath = $slideritems->getSliderImageXsPath();
+						$sliderimagepath = $slideritems->getSliderImagePath();
+						if( empty( $sliderimagexspath ) && !empty( $sliderimagepath ) ){
 							//create MD slider from Main Image
 							$thumbDirtmp = str_replace( $this->_imageprocessor->getSliderMediaPath(), 
 								$this->_imageprocessor->getSliderMediaPath('xs'), 
