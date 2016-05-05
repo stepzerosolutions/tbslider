@@ -332,8 +332,8 @@ class Image
             $destinationFolder = substr($destinationFolder, 0, -1);
         }
 
-        if (!(@is_dir($destinationFolder)
-            || @mkdir($destinationFolder, DriverInterface::WRITEABLE_DIRECTORY_MODE, true)
+        if (!(is_dir($destinationFolder)
+            || mkdir($destinationFolder, DriverInterface::WRITEABLE_DIRECTORY_MODE, true)
         )) {
             throw new \Exception("Unable to create directory '{$destinationFolder}'.");
         }

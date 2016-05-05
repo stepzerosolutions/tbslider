@@ -15,12 +15,12 @@ class Chooser extends \Magento\Backend\App\Action
     /**
      * @var \Magento\Framework\View\LayoutFactory
      */
-    protected $layoutFactory;
+    protected $_layoutFactory;
 
     /**
      * @var RawFactory
      */
-    protected $resultRawFactory;
+    protected $_resultRawFactory;
 
     /**
      * @param Context $context
@@ -29,8 +29,8 @@ class Chooser extends \Magento\Backend\App\Action
      */
     public function __construct(Context $context, LayoutFactory $layoutFactory, RawFactory $resultRawFactory)
     {
-        $this->layoutFactory = $layoutFactory;
-        $this->resultRawFactory = $resultRawFactory;
+        $this->_layoutFactory = $layoutFactory;
+        $this->_resultRawFactory = $resultRawFactory;
         parent::__construct($context);
     }
 
@@ -42,7 +42,7 @@ class Chooser extends \Magento\Backend\App\Action
     public function execute()
     {
         /** @var \Magento\Framework\View\Layout $layout */
-        $layout = $this->layoutFactory->create();
+        $layout = $this->_layoutFactory->create();
 
         $uniqId = $this->getRequest()->getParam('uniq_id');
         $pagesGrid = $layout->createBlock(
@@ -52,7 +52,7 @@ class Chooser extends \Magento\Backend\App\Action
         );
 
         /** @var \Magento\Framework\Controller\Result\Raw $resultRaw */
-        $resultRaw = $this->resultRawFactory->create();
+        $resultRaw = $this->_resultRawFactory->create();
         $resultRaw->setContents($pagesGrid->toHtml());
         return $resultRaw;
     }

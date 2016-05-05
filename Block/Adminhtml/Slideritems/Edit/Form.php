@@ -243,10 +243,17 @@ class Form extends \Magento\Backend\Block\Widget\Form\Generic
             $this->_backendSession->setslideritemsData(null);
         } else {
             // TODO: need to figure out how the DATA can work with forms
-			$filename = ( !empty($slider->getSliderImagePath()) )?$this->_storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA ) . $slider->getSliderImagePath():null;
-			$filenamemd = ( !empty($slider->getSliderImageMdPath()) )?$this->_storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA ) . $slider->getSliderImageMdPath():null;
-			$filenamesm = ( !empty($slider->getSliderImageSmPath()) )?$this->_storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA ) . $slider->getSliderImageSmPath():null;
-			$filenamexs = ( !empty($slider->getSliderImageXsPath()) )?$this->_storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA ) . $slider->getSliderImageXsPath():null;
+			$tmp = $slider->getSliderImagePath();
+			$filename = ( !empty($tmp) )?$this->_storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA ) . $slider->getSliderImagePath():null;
+			
+			$tmp = $slider->getSliderImageMdPath();
+			$filenamemd = ( !empty($tmp) )?$this->_storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA ) . $slider->getSliderImageMdPath():null;
+			
+			$tmp = $slider->getSliderImageSmPath();
+			$filenamesm = ( !empty($tmp) )?$this->_storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA ) . $slider->getSliderImageSmPath():null;
+			
+			$tmp = $slider->getSliderImageXsPath();
+			$filenamexs = ( !empty($tmp) )?$this->_storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA ) . $slider->getSliderImageXsPath():null;
             $form->addValues(
                 [
                     'slideritem_id' => $slider->getId(),

@@ -15,7 +15,8 @@ class Isactive extends \Magento\Backend\Block\Widget\Grid\Column\Renderer\Abstra
      */
     public function render(\Magento\Framework\DataObject $row)
     {
-		$isactive = ( empty( $row->getIsActive() ) )?'Disabled':'Enabled';
+		$tmp = $row->getIsActive();
+		$isactive = ( empty( $tmp ) )?'Disabled':'Enabled';
         return '<span class="grid-row-title">' .
             $isactive .
             '</span>';

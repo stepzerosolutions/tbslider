@@ -62,6 +62,7 @@ implements TemplatesInterface
 				$ol .= ' ></li>
 
 				';
+
 				$url = !empty($slider['slider_url'])?'<a href="'.$slider['slider_url'].'" title="'.$slider['slideritem_title'].'">':'';
 				$urlend = !empty($slider['slider_url'])?'</a>':'';
 				$output .= '<div class="item ';
@@ -69,11 +70,17 @@ implements TemplatesInterface
 				$output .= '">';
 				$default = $this->_storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA ) . $slide->getSliderImagePath();
 				$filename = $default;
-				$filenamemd = ( !empty($slide->getSliderImageMdPath()) )?$this->_storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA ) . 
+				
+				$tmpimg = $slide->getSliderImageMdPath();
+				$filenamemd = ( !empty($tmpimg) )?$this->_storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA ) . 
 				$slide->getSliderImageMdPath():$default;
-				$filenamesm = ( !empty($slide->getSliderImageSmPath()) )?$this->_storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA ) . 
+				
+				$tmpimg = $slide->getSliderImageSmPath();
+				$filenamesm = ( !empty($tmpimg) )?$this->_storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA ) . 
 				$slide->getSliderImageSmPath():$default;
-				$filenamexs = ( !empty($slide->getSliderImageXsPath()) )?$this->_storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA ) . 
+				
+				$tmpimg = $slide->getSliderImageXsPath();
+				$filenamexs = ( !empty($tmpimg) )?$this->_storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA ) . 
 				$slide->getSliderImageXsPath():$default;
 				$responsive = $this->getSliderResponsiveData();			
 
@@ -95,11 +102,20 @@ implements TemplatesInterface
 		if( empty( $output ) ) return false;
 		
 		$outputRender = '<div id="'.$cid.'" class="carousel slide" data-ride="carousel">';
-		$cssClass = ( !empty($this->_sliderdata->getSliderClass()) )?$this->_sliderdata->getSliderClass():'';
-		$dataInterval = ( !empty($this->_sliderdata->getSliderDuration()) )?$this->_sliderdata->getSliderDuration():5000;
-		$dataWrap = ( !empty($this->_sliderdata->getWrap()) )?$this->_sliderdata->getWrap():true;
-		$dataKeyboard = ( !empty($this->_sliderdata->getKeyboard()) )?$this->_sliderdata->getKeyboard():true;
-		$dataPause = ( !empty($this->_sliderdata->getPauseonhover()) )?"hover":"false";
+		$sliderclass = $this->_sliderdata->getSliderClass();
+		$cssClass = ( !empty($sliderclass) )?$this->_sliderdata->getSliderClass():'';
+		
+		$sliderduration = $this->_sliderdata->getSliderDuration();
+		$dataInterval = ( !empty($sliderduration) )?$this->_sliderdata->getSliderDuration():5000;
+		
+		$sliderwrap = $this->_sliderdata->getWrap();
+		$dataWrap = ( !empty($sliderwrap) )?$this->_sliderdata->getWrap():true;
+		
+		$sliderkeyboard = $this->_sliderdata->getKeyboard();
+		$dataKeyboard = ( !empty($sliderkeyboard) )?$this->_sliderdata->getKeyboard():true;
+		
+		$sliderphover = $this->_sliderdata->getPauseonhover();
+		$dataPause = ( !empty($sliderphover) )?"hover":"false";
 		
 		$outputRender .= '<div class="carousel-inner szcarousel '.$cssClass.'" 
 										data-interval="'.$dataInterval.'" 
@@ -135,7 +151,8 @@ implements TemplatesInterface
 		$slider = 'div.slider_'.$this->getSliderData()->getID().'{';
 		$sliderwrap = '.slidercontainer{margin:0 auto;';
 		$slideraftermaxwidth = '';
-		if( !empty($this->getSliderData()->getSliderWidth() ) ) {
+		$getsliderWidth = $this->getSliderData()->getSliderWidth();
+		if( !empty( $getsliderWidth ) ) {
 			if( strstr($this->getSliderData()->getSliderWidth(), "%")!=false ) {
 				$sliderWidth = ( strstr($this->getSliderData()->getSliderWidth(), "px") )?$this->getSliderData()->getSliderWidth().'px':$this->getSliderData()->getSliderWidth();
 			} else {
@@ -148,7 +165,9 @@ implements TemplatesInterface
 			$slider .= "width:100%;";
 			$sliderwrap .= "width:100%;";
 		}
-		if( !empty($this->getSliderData()->getSliderHeight() ) ) {
+		
+		$getsliderHeight = $this->getSliderData()->getSliderHeight();
+		if( !empty( $getsliderHeight ) ) {
 			if( strstr($this->getSliderData()->getSliderHeight(), "%")!=false ) {
 				$sliderHeight = ( strstr($this->getSliderData()->getSliderHeight(), "px") )?$this->getSliderData()->getSliderHeight().'px':$this->getSliderData()->getSliderHeight();
 			} else {
@@ -161,14 +180,18 @@ implements TemplatesInterface
 		$sliderwrap .= '}';
 	
 		$sliderItems = 'div.slider_'.$this->getSliderData()->getID().' .carousel-item{';
-		if( !empty($this->getSliderData()->getSliderWidth() ) ) {
+		
+		
+		if( !empty( $getsliderWidth ) ) {
 			$sliderItems .= "width:100%;";
 		} 
 		$sliderItems .= '}';
 
 		$mobileDevice = '@media (max-width: 768px){';
 		$mobileDevice .= '.slidercontainer{';
-		if( !empty($this->getSliderData()->getSliderWidthxs() ) ) {
+		
+		$getsliderWidthXs = $this->getSliderData()->getSliderWidthxs();
+		if( !empty( $getsliderWidthXs ) ) {
 			$mobileDeviceWidth = sprintf( "width:%dpx;", $this->getSliderData()->getSliderWidthxs() );
 		} else {
 			$mobileDeviceWidth = "width:100%;";
@@ -184,7 +207,9 @@ implements TemplatesInterface
 	
 		$smallDevice = '@media (max-width: 922px){';
 		$smallDevice .= '.slidercontainer{';
-		if( !empty($this->getSliderData()->getSliderWidthsm() ) ) {
+		
+		$getsliderWidthSm = $this->getSliderData()->getSliderWidthsm();
+		if( !empty( $getsliderWidthSm ) ) {
 			$smallDeviceWidth = sprintf( "width:%dpx;", $this->getSliderData()->getSliderWidthsm() );
 		} else {
 			$smallDeviceWidth = "width:100%;";
@@ -200,7 +225,9 @@ implements TemplatesInterface
 		
 		$mediumDevice = '@media (max-width: 1024px){';
 		$mediumDevice .= '.slidercontainer{';
-		if( !empty($this->getSliderData()->getSliderWidthmd() ) ) {
+		
+		$getsliderWidthMd = $this->getSliderData()->getSliderWidthmd();
+		if( !empty( $getsliderWidthMd ) ) {
 			$mediumDeviceWidth = sprintf( "width:%dpx;", $this->getSliderData()->getSliderWidthmd() );
 		} else {
 			$mediumDeviceWidth = "width:100%;";
