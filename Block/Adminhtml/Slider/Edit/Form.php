@@ -278,6 +278,8 @@ class Form extends \Magento\Backend\Block\Widget\Form\Generic
                 'class' => ''
             ]
         );
+		
+		$tmpSliderType = $slider->getSliderType();
         $slider_type = $designFieldset->addField(
             'slider_type',
             'select',
@@ -287,7 +289,7 @@ class Form extends \Magento\Backend\Block\Widget\Form\Generic
                 'title' => __('Slider Type'),
                 'class' => '',
 				'options' => $this->_sliderHelper->getSliderTypeName(),
-				'value' => (( empty($slider->getSliderType()))?0:$slider->getSliderType())
+				'value' => (( empty($tmpSliderType))?0:$slider->getSliderType())
             ]
         );
         $pauseonhover = $designFieldset->addField(
