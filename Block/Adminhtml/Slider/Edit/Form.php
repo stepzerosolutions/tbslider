@@ -292,6 +292,7 @@ class Form extends \Magento\Backend\Block\Widget\Form\Generic
 				'value' => (( empty($tmpSliderType))?0:$slider->getSliderType())
             ]
         );
+		$getPauseonhover = $slider->getPauseonhover();
         $pauseonhover = $designFieldset->addField(
             'pauseonhover',
             'select',
@@ -301,9 +302,10 @@ class Form extends \Magento\Backend\Block\Widget\Form\Generic
                 'title' => __('Pause on hover'),
                 'class' => '',
 				'options' => ['1' => __('Enabled'), '0' => __('Disabled')],
-				'value' => (( empty($slider->getPauseonhover()))?0:$slider->getPauseonhover())
+				'value' => (( empty( $getPauseonhover ))?0:$slider->getPauseonhover())
             ]
         );
+		$getWrap = $slider->getWrap();
         $wrap = $designFieldset->addField(
             'wrap',
             'select',
@@ -313,9 +315,10 @@ class Form extends \Magento\Backend\Block\Widget\Form\Generic
                 'title' => __('Wrap'),
                 'class' => '',
 				'options' => ['1' => __('Enabled'), '0' => __('Disabled')],
-				'value' => (( empty($slider->getWrap()))?0:$slider->getWrap())
+				'value' => (( empty($getWrap))?0:$slider->getWrap())
             ]
         );
+		$getKeyboard = $slider->getKeyboard();
         $keyboard = $designFieldset->addField(
             'keyboard',
             'select',
@@ -325,7 +328,7 @@ class Form extends \Magento\Backend\Block\Widget\Form\Generic
                 'title' => __('Keyboard'),
                 'class' => '',
 				'options' => ['1' => __('Enabled'), '0' => __('Disabled')],
-				'value' => (( empty($slider->getKeyboard()))?0:$slider->getKeyboard())
+				'value' => (( empty($getKeyboard))?0:$slider->getKeyboard())
             ]
         );
         $slidermeta = $designFieldset->addField(
@@ -338,7 +341,7 @@ class Form extends \Magento\Backend\Block\Widget\Form\Generic
                 'class' => ''
             ]
         );
-		
+		$getSliderHidexs = $slider->getSliderHidexs();
         $hidexs = $designFieldset->addField(
             'slider_hidexs',
             'select',
@@ -348,10 +351,11 @@ class Form extends \Magento\Backend\Block\Widget\Form\Generic
                 'title' => __('Hide On Mobile Devices'),
                 'class' => '',
 				'options' => ['1' => __('Enabled'), '0' => __('Disabled')],
-				'value' => (( empty($slider->getSliderHidexs()))?0:$slider->getSliderHidexs())
+				'value' => (( empty( $getSliderHidexs ))?0:$slider->getSliderHidexs())
             ]
         );
 
+		$getSliderDuration = $slider->getSliderDuration();
         $duration = $designFieldset->addField(
             'slider_duration',
             'select',
@@ -364,12 +368,12 @@ class Form extends \Magento\Backend\Block\Widget\Form\Generic
 				'4000' => __('4000'), '5000' => __('5000'), '6000' => __('6000'), '7000' => __('7000'),
 				'8000' => __('8000'), '9000' => __('9000'), '10000' => __('10000'), '15000' => __('15000'),
 				'20000' => __('20000')],
-				'value' => (( empty($slider->getSliderDuration()))?500:$slider->getSliderDuration())
+				'value' => (( empty( $getSliderDuration ))?500:$slider->getSliderDuration())
             ]
         );
 
 
-		
+		$getHidenavigation = $slider->getHidenavigation();
         $hidexs = $designFieldset->addField(
             'hidenavigation',
             'select',
@@ -379,7 +383,7 @@ class Form extends \Magento\Backend\Block\Widget\Form\Generic
                 'title' => __('Hide Navigation Controls'),
                 'class' => '',
 				'options' => ['1' => __('Yes'), '0' => __('No')],
-				'value' => (( empty($slider->getHidenavigation()))?0:$slider->getHidenavigation())
+				'value' => (( empty( $getHidenavigation ))?0:$slider->getHidenavigation())
             ]
         );
 		
