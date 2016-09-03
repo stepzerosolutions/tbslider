@@ -11,7 +11,6 @@ use Stepzerosolutions\Tbslider\Api\Data\SlideritemsInterface;
 use Stepzerosolutions\Tbslider\Api\SlideritemsRepositoryInterface;
 use Magento\Framework\App\Filesystem\DirectoryList;
 
-
 class Save extends \Stepzerosolutions\Tbslider\Controller\Adminhtml\Slideritems
 {
     /**
@@ -21,6 +20,15 @@ class Save extends \Stepzerosolutions\Tbslider\Controller\Adminhtml\Slideritems
 
 
 	protected $_imageprocessor;
+	
+    /**
+     * Event manager proxy
+     *
+     * @var \Magento\Framework\Event\ManagerInterface
+     */
+    protected $eventManager = null;
+	
+	
     /**
      *
      * @param \Magento\Backend\App\Action\Context $context
@@ -31,6 +39,7 @@ class Save extends \Stepzerosolutions\Tbslider\Controller\Adminhtml\Slideritems
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      * @param \Magento\Framework\Reflection\DataObjectProcessor $dataObjectProcessor
 	 * @param \Stepzerosolutions\Tbslider\Model\Image $imageprocessor
+	 * @param \Magento\Framework\Event\ManagerInterface $eventManager
      */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
@@ -42,7 +51,8 @@ class Save extends \Stepzerosolutions\Tbslider\Controller\Adminhtml\Slideritems
         \Magento\Framework\Reflection\DataObjectProcessor $dataObjectProcessor,
 		\Stepzerosolutions\Tbslider\Model\Image $imageprocessor,
 		\Magento\Framework\App\Cache\TypeListInterface $cacheTypeList,
-    	\Magento\Framework\App\Cache\Frontend\Pool $cacheFrontendPool
+    	\Magento\Framework\App\Cache\Frontend\Pool $cacheFrontendPool,
+        \Magento\Framework\Event\ManagerInterface $eventManager
     ) {
         $this->dataObjectProcessor = $dataObjectProcessor;
 		$this->_imageprocessor = $imageprocessor;
@@ -120,54 +130,53 @@ class Save extends \Stepzerosolutions\Tbslider\Controller\Adminhtml\Slideritems
 				/** @var \Magento\Framework\Filesystem\Directory\Read $mediaDirectory */
 				$mediaDirectory = $this->_objectManager->get('Magento\Framework\Filesystem')
 					->getDirectoryRead(DirectoryList::MEDIA);
-				if (isset($_FILES['filename']) && isset($_FILES['filename']['name']) && strlen($_FILES['filename']['name'])) {
-						/*
-						 * Save image upload
-						 */
-						try {
-							$uploader = $this->_objectManager->create(
-								'Magento\MediaStorage\Model\File\Uploader',
-								['fileId' => 'filename']
-							);
-							$uploader->setAllowedExtensions(['jpg', 'jpeg', 'gif', 'png']);
-		
-							/** @var \Magento\Framework\Image\Adapter\AdapterInterface $imageAdapter */
-							$imageAdapter = $this->_objectManager->get('Magento\Framework\Image\AdapterFactory')->create();
-		
-							$uploader->addValidateCallback('banner_image', $imageAdapter, 'validateUploadFile');
-							$uploader->setAllowRenameFiles(true);
-							$uploader->setFilesDispersion(true);
-		
-							$result = $uploader->save(
-								$mediaDirectory->getAbsolutePath( $this->_imageprocessor->getSliderMediaPath() )
-							);
-							
-							$sliderimagepath = $slideritems->getSliderImagePath();
-							if( !empty($sliderimagepath) )	{
-								$this->_imageprocessor->deleteImage($mediaDirectory->getAbsolutePath( $sliderimagepath ));
-								$slideritems->setSliderImagePath('');
-								$thumbDirtmp = str_replace( $this->_imageprocessor->getSliderMediaPath(), 
-									$this->_imageprocessor->getSliderMediaPath('thumb'), 
-									$sliderimagepath
-								);
-								$this->_imageprocessor->deleteImage($mediaDirectory->getAbsolutePath( $thumbDirtmp ));
-							}
+                    
+                    /*
+                     * Save image upload
+                     */
+                    try {
+                        $uploader = $this->_objectManager->create(
+                            'Magento\MediaStorage\Model\File\Uploader',
+                            ['fileId' => 'filename']
+                        );
+                        $uploader->setAllowedExtensions(['jpg', 'jpeg', 'gif', 'png']);
+    
+                        /** @var \Magento\Framework\Image\Adapter\AdapterInterface $imageAdapter */
+                        $imageAdapter = $this->_objectManager->get('Magento\Framework\Image\AdapterFactory')->create();
+    
+                        $uploader->addValidateCallback('banner_image', $imageAdapter, 'validateUploadFile');
+                        $uploader->setAllowRenameFiles(true);
+                        $uploader->setFilesDispersion(true);
+    
+                        $result = $uploader->save(
+                            $mediaDirectory->getAbsolutePath( $this->_imageprocessor->getSliderMediaPath() )
+                        );
+                        
+                        $sliderimagepath = $slideritems->getSliderImagePath();
+                        if( !empty($sliderimagepath) )	{
+                            $this->_imageprocessor->deleteImage($mediaDirectory->getAbsolutePath( $sliderimagepath ));
+                            $slideritems->setSliderImagePath('');
+                            $thumbDirtmp = str_replace( $this->_imageprocessor->getSliderMediaPath(), 
+                                $this->_imageprocessor->getSliderMediaPath('thumb'), 
+                                $sliderimagepath
+                            );
+                            $this->_imageprocessor->deleteImage($mediaDirectory->getAbsolutePath( $thumbDirtmp ));
+                        }
 
-							//create slider item thumb
-							$thumbDirtmp = str_replace( $this->_imageprocessor->getSliderMediaPath(), 
-								$this->_imageprocessor->getSliderMediaPath('thumb'), 
-								$this->_imageprocessor->getSliderMediaPath().$result['file']
-							);
-							$pathinfo = pathinfo( $thumbDirtmp );
-							$this->_imageprocessor->saveSliderItem($mediaDirectory->getAbsolutePath( $pathinfo['dirname'] ."/" ), $result);
-							$slideritems->setSliderImagePath( $this->_imageprocessor->getSliderMediaPath().$result['file'] );
-						} catch (\Exception $e) {
-							if ($e->getCode() == 0) {
-								$this->messageManager->addError($e->getMessage());
-							}
-						}
-					} else {
-						if (isset($data['filename']) ) {
+                        //create slider item thumb
+                        $thumbDirtmp = str_replace( $this->_imageprocessor->getSliderMediaPath(), 
+                            $this->_imageprocessor->getSliderMediaPath('thumb'), 
+                            $this->_imageprocessor->getSliderMediaPath().$result['file']
+                        );
+                        $pathinfo = pathinfo( $thumbDirtmp );
+                        $this->_imageprocessor->saveSliderItem($mediaDirectory->getAbsolutePath( $pathinfo['dirname'] ."/" ), $result);
+                        $slideritems->setSliderImagePath( $this->_imageprocessor->getSliderMediaPath().$result['file'] );
+                    } catch (\Exception $e) {
+                        if ($e->getCode() == 0) {
+                            $this->messageManager->addError($e->getMessage());
+                        }
+                    }
+				if (isset($data['filename']) ) {
 							if (isset($data['filename']['delete'])) {
 								$data['filename'] = null;
 								$data['delete_image'] = true;
@@ -187,198 +196,193 @@ class Save extends \Stepzerosolutions\Tbslider\Controller\Adminhtml\Slideritems
 								$data['filename'] = null;
 							}
 						}
-					}
-				if (isset($_FILES['filenamemd']) && isset($_FILES['filenamemd']['name']) && strlen($_FILES['filenamemd']['name'])) {
-						/*
-						 * Save image upload
-						 */
-						try {
-							$uploader = $this->_objectManager->create(
-								'Magento\MediaStorage\Model\File\Uploader',
-								['fileId' => 'filenamemd']
-							);
-							$uploader->setAllowedExtensions(['jpg', 'jpeg', 'gif', 'png']);
-		
-							/** @var \Magento\Framework\Image\Adapter\AdapterInterface $imageAdapter */
-							$imageAdapter = $this->_objectManager->get('Magento\Framework\Image\AdapterFactory')->create();
-		
-							$uploader->addValidateCallback('banner_image', $imageAdapter, 'validateUploadFile');
-							$uploader->setAllowRenameFiles(true);
-							$uploader->setFilesDispersion(true);
-		
-							$result = $uploader->save(
-								$mediaDirectory->getAbsolutePath( $this->_imageprocessor->getSliderMediaPath('md') )
-							);
-							$slideritems->setSliderImageMdPath( $this->_imageprocessor->getSliderMediaPath('md').$result['file'] );
-						} catch (\Exception $e) {
-							if ($e->getCode() == 0) {
-								$this->messageManager->addError($e->getMessage());
-							}
-						}
-					} else {
-						if (isset($data['filenamemd']) ) {
-							if (isset($data['filenamemd']['delete'])) {
-								$data['filenamemd'] = null;
-								$data['delete_image'] = true;
-								$sliderimagemdpath = $slideritems->getSliderImageMdPath();
-								if( !empty($sliderimagemdpath) )	{
-									$this->_imageprocessor->deleteImage($mediaDirectory->getAbsolutePath( $sliderimagemdpath ));
-									$slideritems->setSliderImageMdPath('');
-								}
-							} elseif (isset($data['filenamemd']['value'])) {
-								$data['filenamemd'] = $data['filenamemd']['value'];
-							} else {
-								$data['filenamemd'] = null;
-							}
-						}
-						
-						$sliderimagemdpath = $slideritems->getSliderImageMdPath();
-						$sliderimagepath = $slideritems->getSliderImagePath();
-						if( empty( $sliderimagemdpath ) && !empty( $sliderimagepath ) ){
-							//create MD slider from Main Image
-							$thumbDirtmp = str_replace( $this->_imageprocessor->getSliderMediaPath(), 
-								$this->_imageprocessor->getSliderMediaPath('md'), 
-								$slideritems->getSliderImagePath()
-							);
-							$pathinfo = pathinfo( $thumbDirtmp );
-							$result = array('name' => $pathinfo['basename'], 'file' => $thumbDirtmp, 'path' => $mediaDirectory->getAbsolutePath( $pathinfo['dirname'] ) );
-							$this->_imageprocessor->saveSliderResponsiveImages( 
-										$mediaDirectory->getAbsolutePath( $slideritems->getSliderImagePath() ),
-										$mediaDirectory->getAbsolutePath( $pathinfo['dirname'] ), 
-										$result,
-										1024
-										);
-							$slideritems->setSliderImageMdPath($thumbDirtmp);
-						}
-				}
-				if (isset($_FILES['filenamesm']) && isset($_FILES['filenamesm']['name']) && strlen($_FILES['filenamesm']['name'])) {
-						/*
-						 * Save image upload
-						 */
-						try {
-							$uploader = $this->_objectManager->create(
-								'Magento\MediaStorage\Model\File\Uploader',
-								['fileId' => 'filenamesm']
-							);
-							$uploader->setAllowedExtensions(['jpg', 'jpeg', 'gif', 'png']);
-		
-							/** @var \Magento\Framework\Image\Adapter\AdapterInterface $imageAdapter */
-							$imageAdapter = $this->_objectManager->get('Magento\Framework\Image\AdapterFactory')->create();
-		
-							$uploader->addValidateCallback('banner_image', $imageAdapter, 'validateUploadFile');
-							$uploader->setAllowRenameFiles(true);
-							$uploader->setFilesDispersion(true);
-		
-							$result = $uploader->save(
-								$mediaDirectory->getAbsolutePath( $this->_imageprocessor->getSliderMediaPath() )
-							);
-							$slideritems->setSliderImageSmPath( $this->_imageprocessor->getSliderMediaPath().$result['file'] );
-						} catch (\Exception $e) {
-							if ($e->getCode() == 0) {
-								$this->messageManager->addError($e->getMessage());
-							}
-						}
-					} else {
-						if (isset($data['filenamesm']) ) {
-							if (isset($data['filenamesm']['delete'])) {
-								$data['filenamesm'] = null;
-								$data['delete_image'] = true;
-								$sliderimagesmpath = $slideritems->getSliderImageSmPath();
-								if( !empty($sliderimagesmpath) )	{
-									$this->_imageprocessor->deleteImage($mediaDirectory->getAbsolutePath( $sliderimagesmpath ));
-									$slideritems->setSliderImageSmPath('');
-								}
-							} elseif (isset($data['filenamesm']['value'])) {
-								$data['filenamesm'] = $data['filenamesm']['value'];
-							} else {
-								$data['filenamesm'] = null;
-							}
-						}
-						
-						$sliderimagesmpath = $slideritems->getSliderImageSmPath();
-						$sliderimagepath = $slideritems->getSliderImagePath();
-						if( empty($sliderimagesmpath ) && !empty( $sliderimagepath ) ){
-							//create MD slider from Main Image
-							$thumbDirtmp = str_replace( $this->_imageprocessor->getSliderMediaPath(), 
-								$this->_imageprocessor->getSliderMediaPath('sm'), 
-								$slideritems->getSliderImagePath()
-							);
-							$pathinfo = pathinfo( $thumbDirtmp );
-							$result = array('name' => $pathinfo['basename'], 'file' => $thumbDirtmp, 'path' => $mediaDirectory->getAbsolutePath( $pathinfo['dirname'] ) );
-							$this->_imageprocessor->saveSliderResponsiveImages( 
-										$mediaDirectory->getAbsolutePath( $slideritems->getSliderImagePath() ),
-										$mediaDirectory->getAbsolutePath( $pathinfo['dirname'] ), 
-										$result,
-										922
-										);
-							$slideritems->setSliderImageSmPath($thumbDirtmp);
-						}
-				}
-				if (isset($_FILES['filenamexs']) && isset($_FILES['filenamexs']['name']) && strlen($_FILES['filenamexs']['name'])) {
-						/*
-						 * Save image upload
-						 */
-						try {
-							$uploader = $this->_objectManager->create(
-								'Magento\MediaStorage\Model\File\Uploader',
-								['fileId' => 'filenamexs']
-							);
-							$uploader->setAllowedExtensions(['jpg', 'jpeg', 'gif', 'png']);
-		
-							/** @var \Magento\Framework\Image\Adapter\AdapterInterface $imageAdapter */
-							$imageAdapter = $this->_objectManager->get('Magento\Framework\Image\AdapterFactory')->create();
-		
-							$uploader->addValidateCallback('banner_image', $imageAdapter, 'validateUploadFile');
-							$uploader->setAllowRenameFiles(true);
-							$uploader->setFilesDispersion(true);
-		
-							$result = $uploader->save(
-								$mediaDirectory->getAbsolutePath( $this->_imageprocessor->getSliderMediaPath() )
-							);
-							$slideritems->setSliderImageXsPath( $this->_imageprocessor->getSliderMediaPath().$result['file'] );
-						} catch (\Exception $e) {
-							if ($e->getCode() == 0) {
-								$this->messageManager->addError($e->getMessage());
-							}
-						}
-					} else {
-						if (isset($data['filenamexs']) && isset($data['filenamexs']['value'])) {
-							if (isset($data['filenamexs']['delete'])) {
-								$data['filenamexs'] = null;
-								$data['delete_image'] = true;
-								$sliderimagexspath = $slideritems->getSliderImageXsPath();
-								if( !empty($sliderimagexspath) )	{
-									$this->_imageprocessor->deleteImage($mediaDirectory->getAbsolutePath( $sliderimagexspath ));
-									$slideritems->setSliderImageXsPath('');
-								}
-							} elseif (isset($data['filenamexs']['value'])) {
-								$data['filenamexs'] = $data['filenamexs']['value'];
-							} else {
-								$data['filenamexs'] = null;
-							}
-						}
-						
-						$sliderimagexspath = $slideritems->getSliderImageXsPath();
-						$sliderimagepath = $slideritems->getSliderImagePath();
-						if( empty( $sliderimagexspath ) && !empty( $sliderimagepath ) ){
-							//create MD slider from Main Image
-							$thumbDirtmp = str_replace( $this->_imageprocessor->getSliderMediaPath(), 
-								$this->_imageprocessor->getSliderMediaPath('xs'), 
-								$slideritems->getSliderImagePath()
-							);
-							$pathinfo = pathinfo( $thumbDirtmp );
-							$result = array('name' => $pathinfo['basename'], 'file' => $thumbDirtmp, 'path' => $mediaDirectory->getAbsolutePath( $pathinfo['dirname'] ) );
-							$this->_imageprocessor->saveSliderResponsiveImages( 
-										$mediaDirectory->getAbsolutePath( $slideritems->getSliderImagePath() ),
-										$mediaDirectory->getAbsolutePath( $pathinfo['dirname'] ), 
-										$result,
-										768
-										);
-							$slideritems->setSliderImageXsPath($thumbDirtmp);
-						}
-				}
+                        
+                        
+                        
+
+                /*
+                 * Save slider Md image upload
+                 */
+                try {
+                    $uploader = $this->_objectManager->create(
+                        'Magento\MediaStorage\Model\File\Uploader',
+                        ['fileId' => 'filenamemd']
+                    );
+                    $uploader->setAllowedExtensions(['jpg', 'jpeg', 'gif', 'png']);
+
+                    /** @var \Magento\Framework\Image\Adapter\AdapterInterface $imageAdapter */
+                    $imageAdapter = $this->_objectManager->get('Magento\Framework\Image\AdapterFactory')->create();
+
+                    $uploader->addValidateCallback('banner_image', $imageAdapter, 'validateUploadFile');
+                    $uploader->setAllowRenameFiles(true);
+                    $uploader->setFilesDispersion(true);
+
+                    $result = $uploader->save(
+                        $mediaDirectory->getAbsolutePath( $this->_imageprocessor->getSliderMediaPath('md') )
+                    );
+                    $slideritems->setSliderImageMdPath( $this->_imageprocessor->getSliderMediaPath('md').$result['file'] );
+                } catch (\Exception $e) {
+                    if ($e->getCode() == 0) {
+                        $this->messageManager->addError($e->getMessage());
+                    }
+                }
+
+                if (isset($data['filenamemd']) ) {
+                    if (isset($data['filenamemd']['delete'])) {
+                        $data['filenamemd'] = null;
+                        $data['delete_image'] = true;
+                        $sliderimagemdpath = $slideritems->getSliderImageMdPath();
+                        if( !empty($sliderimagemdpath) )	{
+                            $this->_imageprocessor->deleteImage($mediaDirectory->getAbsolutePath( $sliderimagemdpath ));
+                            $slideritems->setSliderImageMdPath('');
+                        }
+                    } elseif (isset($data['filenamemd']['value'])) {
+                        $data['filenamemd'] = $data['filenamemd']['value'];
+                    } else {
+                        $data['filenamemd'] = null;
+                    }
+                }
+                
+                if( empty($slideritems->getSliderImageMdPath() ) && !empty( $slideritems->getSliderImagePath() ) ){
+                    //create MD slider from Main Image
+                    $thumbDirtmp = str_replace( $this->_imageprocessor->getSliderMediaPath(), 
+                        $this->_imageprocessor->getSliderMediaPath('md'), 
+                        $slideritems->getSliderImagePath()
+                    );
+                    $pathinfo = pathinfo( $thumbDirtmp );
+                    $result = array('name' => $pathinfo['basename'], 'file' => $thumbDirtmp, 'path' => $mediaDirectory->getAbsolutePath( $pathinfo['dirname'] ) );
+                    $this->_imageprocessor->saveSliderResponsiveImages( 
+                                $mediaDirectory->getAbsolutePath( $slideritems->getSliderImagePath() ),
+                                $mediaDirectory->getAbsolutePath( $pathinfo['dirname'] ), 
+                                $result,
+                                1024
+                                );
+                    $slideritems->setSliderImageMdPath($thumbDirtmp);
+                }
+
+                /*
+                 * Save slider SM image upload
+                 */
+                try {
+                    $uploader = $this->_objectManager->create(
+                        'Magento\MediaStorage\Model\File\Uploader',
+                        ['fileId' => 'filenamesm']
+                    );
+                    $uploader->setAllowedExtensions(['jpg', 'jpeg', 'gif', 'png']);
+
+                    /** @var \Magento\Framework\Image\Adapter\AdapterInterface $imageAdapter */
+                    $imageAdapter = $this->_objectManager->get('Magento\Framework\Image\AdapterFactory')->create();
+
+                    $uploader->addValidateCallback('banner_image', $imageAdapter, 'validateUploadFile');
+                    $uploader->setAllowRenameFiles(true);
+                    $uploader->setFilesDispersion(true);
+
+                    $result = $uploader->save(
+                        $mediaDirectory->getAbsolutePath( $this->_imageprocessor->getSliderMediaPath() )
+                    );
+                    $slideritems->setSliderImageSmPath( $this->_imageprocessor->getSliderMediaPath().$result['file'] );
+                } catch (\Exception $e) {
+                    if ($e->getCode() == 0) {
+                        $this->messageManager->addError($e->getMessage());
+                    }
+                }
+
+                if (isset($data['filenamesm']) ) {
+                    if (isset($data['filenamesm']['delete'])) {
+                        $data['filenamesm'] = null;
+                        $data['delete_image'] = true;
+                        $sliderimagesmpath = $slideritems->getSliderImageSmPath();
+                        if( !empty($sliderimagesmpath) )	{
+                            $this->_imageprocessor->deleteImage($mediaDirectory->getAbsolutePath( $sliderimagesmpath ));
+                            $slideritems->setSliderImageSmPath('');
+                        }
+                    } elseif (isset($data['filenamesm']['value'])) {
+                        $data['filenamesm'] = $data['filenamesm']['value'];
+                    } else {
+                        $data['filenamesm'] = null;
+                    }
+                }
+                if( empty($slideritems->getSliderImageSmPath() ) && !empty( $slideritems->getSliderImagePath() ) ){
+                    //create MD slider from Main Image
+                    $thumbDirtmp = str_replace( $this->_imageprocessor->getSliderMediaPath(), 
+                        $this->_imageprocessor->getSliderMediaPath('sm'), 
+                        $slideritems->getSliderImagePath()
+                    );
+                    $pathinfo = pathinfo( $thumbDirtmp );
+                    $result = array('name' => $pathinfo['basename'], 'file' => $thumbDirtmp, 'path' => $mediaDirectory->getAbsolutePath( $pathinfo['dirname'] ) );
+                    $this->_imageprocessor->saveSliderResponsiveImages( 
+                                $mediaDirectory->getAbsolutePath( $slideritems->getSliderImagePath() ),
+                                $mediaDirectory->getAbsolutePath( $pathinfo['dirname'] ), 
+                                $result,
+                                922
+                                );
+                    $slideritems->setSliderImageSmPath($thumbDirtmp);
+                }
+
+
+                /*
+                 * Save Xs image upload
+                 */
+                try {
+                    $uploader = $this->_objectManager->create(
+                        'Magento\MediaStorage\Model\File\Uploader',
+                        ['fileId' => 'filenamexs']
+                    );
+                    $uploader->setAllowedExtensions(['jpg', 'jpeg', 'gif', 'png']);
+
+                    /** @var \Magento\Framework\Image\Adapter\AdapterInterface $imageAdapter */
+                    $imageAdapter = $this->_objectManager->get('Magento\Framework\Image\AdapterFactory')->create();
+
+                    $uploader->addValidateCallback('banner_image', $imageAdapter, 'validateUploadFile');
+                    $uploader->setAllowRenameFiles(true);
+                    $uploader->setFilesDispersion(true);
+
+                    $result = $uploader->save(
+                        $mediaDirectory->getAbsolutePath( $this->_imageprocessor->getSliderMediaPath() )
+                    );
+                    $slideritems->setSliderImageXsPath( $this->_imageprocessor->getSliderMediaPath().$result['file'] );
+                } catch (\Exception $e) {
+                    if ($e->getCode() == 0) {
+                        $this->messageManager->addError($e->getMessage());
+                    }
+                }
+
+                if (isset($data['filenamexs']) && isset($data['filenamexs']['value'])) {
+                    if (isset($data['filenamexs']['delete'])) {
+                        $data['filenamexs'] = null;
+                        $data['delete_image'] = true;
+                        $sliderimagexspath = $slideritems->getSliderImageXsPath();
+                        if( !empty($sliderimagexspath) )	{
+                            $this->_imageprocessor->deleteImage($mediaDirectory->getAbsolutePath( $sliderimagexspath ));
+                            $slideritems->setSliderImageXsPath('');
+                        }
+                    } elseif (isset($data['filenamexs']['value'])) {
+                        $data['filenamexs'] = $data['filenamexs']['value'];
+                    } else {
+                        $data['filenamexs'] = null;
+                    }
+                }
+                if( empty($slideritems->getSliderImageXsPath() ) && !empty( $slideritems->getSliderImagePath() ) ){
+                    //create MD slider from Main Image
+                    $thumbDirtmp = str_replace( $this->_imageprocessor->getSliderMediaPath(), 
+                        $this->_imageprocessor->getSliderMediaPath('xs'), 
+                        $slideritems->getSliderImagePath()
+                    );
+                    $pathinfo = pathinfo( $thumbDirtmp );
+                    $result = array('name' => $pathinfo['basename'], 'file' => $thumbDirtmp, 'path' => $mediaDirectory->getAbsolutePath( $pathinfo['dirname'] ) );
+                    $this->_imageprocessor->saveSliderResponsiveImages( 
+                                $mediaDirectory->getAbsolutePath( $slideritems->getSliderImagePath() ),
+                                $mediaDirectory->getAbsolutePath( $pathinfo['dirname'] ), 
+                                $result,
+                                768
+                                );
+                    $slideritems->setSliderImageXsPath($thumbDirtmp);
+                }
 
                 $slider = $this->slideritemsRepository->save($slideritems);
+				$this->eventManager->dispatch('tbslider_slider_items_save_after', ['slideritems' => $slideritems]);
+				
+				
 				$this->cleanCache();
                 $this->messageManager->addSuccess(__('You saved the Slider item.'));
                 $resultRedirect->setPath('tbslider/slideritems');
@@ -407,4 +411,28 @@ class Save extends \Stepzerosolutions\Tbslider\Controller\Adminhtml\Slideritems
 			$cacheFrontend->getBackend()->clean();
 		}
 	}
+    
+    public function uploadFileAndGetName($input){
+    }
+    
+public function uploadFileAndGetName($input, $destinationFolder)
+{
+    try {
+
+            $uploader = $this->uploaderFactory->create(array('fileId' => $input));
+            /** test The File with Callback here */
+            $uploader->setAllowedExtensions(['jpg', 'jpeg', 'gif', 'png']);
+            $uploader->setAllowRenameFiles(true);
+            $uploader->setFilesDispersion(true);
+            $uploader->setAllowCreateFolders(true);
+            $result = $uploader->save($destinationFolder);
+            return $result['file'];
+
+    } catch (\Exception $e) {             
+        if ($e->getCode() != \Magento\Framework\File\Uploader::TMP_NAME_EMPTY) {
+            throw new FrameworkException($e->getMessage());
+        }
+    }
+    return '';
+}
 }
